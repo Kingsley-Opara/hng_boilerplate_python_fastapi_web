@@ -1,4 +1,3 @@
-import requests
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Annotated, Optional
@@ -9,6 +8,7 @@ from api.core.base.services import Service
 from api.utils.settings import settings
 from api.v1.routes.facebook_login import get_db
 from api.v1.models import *
+from security import safe_requests
 
 
 class FbUserService(Service):
@@ -102,7 +102,7 @@ class FbUserService(Service):
             + "&grant_type=client_credentials"
         )
         try:
-            appToken = requests.get(appLink).json()["access_token"]
+            appToken = safe_requests.get(appLink).json()["access_token"]
         except (ValueError, KeyError, TypeError) as error:
             return error
         secondAccessToken = (
@@ -112,7 +112,7 @@ class FbUserService(Service):
             + appToken
         )
         try:
-            data = requests.get(secondAccessToken).json()["data"]
+            data = safe_requests.get(secondAccessToken).json()["data"]
             if not data.get("is_valid"):
                 return None
             userId = data.get("user_id")
@@ -129,7 +129,7 @@ class FbUserService(Service):
             + user_token
         )
         try:
-            userData = requests.get(dataLink).json()
+            userData = safe_requests.get(dataLink).json()
         except (ValueError, KeyError, TypeError) as error:
             return error
         userData["provider"] = "facebook"
