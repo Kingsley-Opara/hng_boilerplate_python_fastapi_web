@@ -1,4 +1,3 @@
-import random
 import string
 from typing import Any, Optional
 import bcrypt, datetime as dt
@@ -17,6 +16,7 @@ from api.v1.models.user import User
 from api.v1.models.token_login import TokenLogin
 from api.v1.schemas import user
 from api.v1.schemas import token
+import secrets
 
 oauth2_scheme = OAuth2PasswordBearer('/api/v1/auth/login')
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -356,7 +356,7 @@ class UserService(Service):
     
     def generate_token(self):
         '''Generate a 6-digit token'''
-        return ''.join(random.choices(string.digits, k=6)), datetime.utcnow() + timedelta(minutes=10)
+        return ''.join(secrets.SystemRandom().choices(string.digits, k=6)), datetime.utcnow() + timedelta(minutes=10)
 
 
 
